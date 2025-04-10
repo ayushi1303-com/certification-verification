@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body,html{
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        .container{
+        height: 100%;
+        background-color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+        .box{
+            background-color: white;
+            text-align: center;
+            padding: 50px 50px;
+            border-radius: 20px;
+            border: 5px solid gold;
+        }
+       
+        button{
+            background-color: blue;
+            color: white;
+            height: 50px;
+            width: 150px;
+            border-radius: 20px;
+            border: 2px solid gold;
+        }
+        button:hover{
+            transform: scale(1.03);
+        }
+       
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+    <div class="box">
+        <h2>Verify Your Certificate Issued</h2>
+    <input type="text" id="certificateInput" height="40=px" width="150px" placeholder="Enter certificate Number"> <br><br>
+    <button onclick="validateCertificate()">verify</button>
+    <p id="result"></p>
+
+    </div>
+    </div>
+    <script>
+        
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmjrwlIs9UFS0x_9tnT_duP9sIbFHPufKUB_FemyE2nVSULUl0KvZe1GfpbOwRq5C8dmQ9jNlo14nX/pub?output=csv'
+    async function validateCertificate() {
+      const input = document.getElementById('certificateInput').value.trim();
+      const result = document.getElementById('result');
+
+      if (!input) {
+        result.textContent = 'Please enter a certificate number.';
+        result.style.color = 'red';
+        return;
+      }
+
+      try {
+        const response = await fetch(sheetUrl);
+        const data = await response.text();
+        const rows = data.split('\n').map(row => row.split(','));
+
+        const headers = rows[0];
+        const certIndex = headers.findIndex(h => h.toLowerCase().includes('certificate'));
+
+        const match = rows.find((row, index) => index > 0 && row[certIndex] === input);
+    
+        if (match) {
+          result.textContent = 'Certificate is valid.';
+          result.style.color = 'green';
+        } else {
+          result.textContent = 'Certificate not found.';
+          result.style.color = 'red';
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        result.textContent = 'Error while fetching.';
+        result.style.color = 'red';
+      }
+    }
+  
+    </script>
+    
+</body>
+</html>
